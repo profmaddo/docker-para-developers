@@ -1,0 +1,92 @@
+version: "3.8"
+services:
+  db:
+    container_name: postgres_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: test_db
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+
+  flask_app:
+    container_name: flask_container
+    image: python:3.9-slim
+    restart: always
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    command: flask run --host=0.0.0.0
+    environment:
+      FLASK_ENV: development
+      DATABASE_URL: postgres://root:root@db:5432/test_db
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  php_app:
+    container_name: php_container
+    image: php:8.0-cli
+    restart: always
+    volumes:
+      - ./php:/var/www/html
+    working_dir: /var/www/html
+    command: php -S 0.0.0.0:8000 -t /var/www/html
+    ports:
+      - "8000:8000"
+
+  tomcat_app:
+    container_name: tomcat_container
+    image: tomcat:9.0
+    restart: always
+    volumes:
+      - ./spring_boot_project:/usr/local/tomcat/webapps
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  mysql_db:
+    container_name: mysql_container
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    container_name: phpmyadmin_container
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql_db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql_db
+
+volumes:
+  mysql_data:
