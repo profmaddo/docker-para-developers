@@ -52,8 +52,8 @@ Descrição: Uma interface web para gerenciar seu banco de dados MySQL. Acesse v
 
 Clone o Repositório:
 
-git clone https://github.com/seuusuario/seurepositorio.git
-cd seurepositorio
+git clone [https://github.com/seuusuario/seurepositorio.git](https://github.com/profmaddo/docker-para-developers.git)
+cd dicker-para-developers
 Suba os Contêineres:
  
 docker-compose up -d
